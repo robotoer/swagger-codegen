@@ -4,34 +4,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
-{{#operations}}class {{classname}} extends Controller
-{
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-    }
+use Laravel\Lumen\Routing\Controller;
 
+{{#operations}}abstract class {{classname}} extends Controller {
     {{#operation}}
     /**
      * Operation {{{operationId}}}
      *
      * {{{summary}}}.
      *
+     * @param \Illuminate\Http\Request $request Http request.
   {{#pathParams}}   * @param {{dataType}} ${{paramName}} {{description}} {{#required}}(required){{/required}}{{^required}}(optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
   {{/pathParams}}   *
-     * @return Http response
+     * @return \Illuminate\Http\Response Http response
      */
-    public function {{operationId}}({{#pathParams}}${{paramName}}{{#hasMore}}, {{/hasMore}}{{/pathParams}})
-    {
-        $input = Request::all();
+    protected abstract function {{operationId}}(Request $request{{#pathParams}}, ${{paramName}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}) : Response;
 
-        //path params validation
+    /**
+     * Operation {{{operationId}}}
+     *
+     * {{{summary}}}.
+     *
+     * @param \Illuminate\Http\Request $request Http request.
+  {{#pathParams}}   * @param {{dataType}} ${{paramName}} {{description}} {{#required}}(required){{/required}}{{^required}}(optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+  {{/pathParams}}   *
+     * @return \Illuminate\Http\Response Http response
+     */
+    public function {{operationId}}AndValidate(Request $request{{#pathParams}}, ${{paramName}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}) : Response {
         {{#pathParams}}
         {{#hasValidation}}
+        // Path parameters validation.
         {{#maxLength}}
         if (strlen(${{paramName}}) > {{maxLength}}) {
             throw new \InvalidArgumentException('invalid length for ${{paramName}} when calling {{classname}}.{{operationId}}, must be smaller than or equal to {{maxLength}}.');
@@ -70,58 +75,55 @@ use Illuminate\Support\Facades\Request;
         {{/hasValidation}}
         {{/pathParams}}
 
-
-        //not path params validation
         {{#allParams}}
         {{^pathParams}}
+        // Other parameter validation.
         {{#required}}
-        if (!isset($input['{{paramName}}'])) {
+        if (is_null($request->json('{{paramName}}'))) {
             throw new \InvalidArgumentException('Missing the required parameter ${{paramName}} when calling {{operationId}}');
         }
         {{/required}}
         {{#hasValidation}}
         {{#maxLength}}
-        if (strlen($input['{{paramName}}']) > {{maxLength}}) {
+        if (strlen($request->json('{{paramName}}')) > {{maxLength}}) {
             throw new \InvalidArgumentException('invalid length for ${{paramName}} when calling {{classname}}.{{operationId}}, must be smaller than or equal to {{maxLength}}.');
         }
         {{/maxLength}}
         {{#minLength}}
-        if (strlen($input['{{paramName}}']) < {{minLength}}) {
+        if (strlen($request->json('{{paramName}}')) < {{minLength}}) {
             throw new \InvalidArgumentException('invalid length for ${{paramName}} when calling {{classname}}.{{operationId}}, must be bigger than or equal to {{minLength}}.');
         }
         {{/minLength}}
         {{#maximum}}
-        if ($input['{{paramName}}'] >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}}) {
+        if ($request->json('{{paramName}}') >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}}) {
             throw new \InvalidArgumentException('invalid value for ${{paramName}} when calling {{classname}}.{{operationId}}, must be smaller than {{^exclusiveMaximum}}or equal to {{/exclusiveMaximum}}{{maximum}}.');
         }
         {{/maximum}}
         {{#minimum}}
-        if ($input['{{paramName}}'] <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}}) {
+        if ($request->json('{{paramName}}') <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}}) {
             throw new \InvalidArgumentException('invalid value for ${{paramName}} when calling {{classname}}.{{operationId}}, must be bigger than {{^exclusiveMinimum}}or equal to {{/exclusiveMinimum}}{{minimum}}.');
         }
         {{/minimum}}
         {{#pattern}}
-        if (!preg_match("{{{pattern}}}", $input['{{paramName}}'])) {
+        if (!preg_match("{{{pattern}}}", $request->json('{{paramName}}'))) {
             throw new \InvalidArgumentException('invalid value for ${{paramName}} when calling {{classname}}.{{operationId}}, must conform to the pattern {{{pattern}}}.');
         }
         {{/pattern}}
         {{#maxItems}}
-        if (count($input['{{paramName}}']) > {{maxItems}}) {
+        if (count($request->json('{{paramName}}')) > {{maxItems}}) {
             throw new \InvalidArgumentException('invalid length for ${{paramName}} when calling {{classname}}.{{operationId}}, number of items must be less than or equal to {{maxItems}}.');
         }
         {{/maxItems}}
         {{#minItems}}
-        if (count($input['{{paramName}}']) < {{minItems}}) {
+        if (count($request->json('{{paramName}}')) < {{minItems}}) {
             throw new \InvalidArgumentException('invalid length for ${{paramName}} when calling {{classname}}.{{operationId}}, number of items must be greater than or equal to {{minItems}}.');
         }
         {{/minItems}}
         {{/hasValidation}}
-        ${{paramName}} = $input['{{paramName}}'];
-
         {{/pathParams}}
         {{/allParams}}
 
-        return response('How about implementing {{nickname}} as a {{httpMethod}} method ?');
+        return $this->{{operationId}}($request{{#pathParams}}, ${{paramName}}{{#hasMore}}, {{/hasMore}}{{/pathParams}});
     }
     {{/operation}}
 }

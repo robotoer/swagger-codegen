@@ -14,7 +14,7 @@ public class LumenServerCodegen extends AbstractPhpCodegen
 {
      @SuppressWarnings("hiding")
     protected String apiVersion = "1.0.0";
-        
+
     /**
      * Configures the type of generator.
      * 
@@ -55,19 +55,20 @@ public class LumenServerCodegen extends AbstractPhpCodegen
          */
         invokerPackage = "lumen";
         packagePath = "";
+        srcBasePath = ".";
 
         /*
          * Api Package.  Optional, if needed, this can be used in templates
          */
         apiPackage = "app.Http.Controllers";
+        apiTemplateFiles.put("apiImpl.mustache", "Impl.php");
 
         /*
          * Model Package.  Optional, if needed, this can be used in templates
          */
-        modelPackage = "models";
+        modelPackage = "app.Http.Models";
 
         // template files want to be ignored
-        modelTemplateFiles.clear();
         apiTestTemplateFiles.clear();
         apiDocTemplateFiles.clear();
         modelDocTemplateFiles.clear();
@@ -85,16 +86,15 @@ public class LumenServerCodegen extends AbstractPhpCodegen
          */
         supportingFiles.add(new SupportingFile("composer.mustache", packagePath + File.separator + srcBasePath, "composer.json"));
         supportingFiles.add(new SupportingFile("readme.md", packagePath + File.separator + srcBasePath, "readme.md"));
-        supportingFiles.add(new SupportingFile("app.php", packagePath + File.separator + srcBasePath + File.separator + "bootstrap", "app.php"));
+        supportingFiles.add(new SupportingFile("app.mustache", packagePath + File.separator + srcBasePath + File.separator + "bootstrap", "app.php"));
         supportingFiles.add(new SupportingFile("index.php", packagePath + File.separator + srcBasePath + File.separator + "public", "index.php"));
         supportingFiles.add(new SupportingFile("User.php", packagePath + File.separator + srcBasePath + File.separator + "app", "User.php"));
         supportingFiles.add(new SupportingFile("Kernel.php", packagePath + File.separator + srcBasePath + File.separator + "app"  + File.separator + "Console", "Kernel.php"));
         supportingFiles.add(new SupportingFile("Handler.php", packagePath + File.separator + srcBasePath + File.separator + "app"  + File.separator + "Exceptions", "Handler.php"));
         supportingFiles.add(new SupportingFile("routes.mustache", packagePath + File.separator + srcBasePath + File.separator + "app"  + File.separator + "Http", "routes.php"));
-        
-        supportingFiles.add(new SupportingFile("Controller.php", packagePath + File.separator + srcBasePath + File.separator + "app"  + File.separator + "Http" + File.separator + "Controllers" + File.separator, "Controller.php"));
+
         supportingFiles.add(new SupportingFile("Authenticate.php", packagePath + File.separator + srcBasePath + File.separator + "app"  + File.separator + "Http" + File.separator + "Middleware" + File.separator, "Authenticate.php"));
-        
+        supportingFiles.add(new SupportingFile("Model.php", packagePath + File.separator + srcBasePath + File.separator + "app" + File.separator + "Http" + File.separator + "Models" + File.separator, "Model.php"));
     }
 
     // override with any special post-processing

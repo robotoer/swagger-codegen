@@ -1,0 +1,27 @@
+<?php
+
+{{>licenseInfo}}
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+{{#operations}}class {{classname}}Impl extends {{classname}} {
+    {{#operation}}
+    /**
+     * Operation {{{operationId}}}
+     *
+     * {{{summary}}}.
+     *
+     * @param \Illuminate\Http\Request $request Http request.
+  {{#pathParams}}   * @param {{dataType}} ${{paramName}} {{description}} {{#required}}(required){{/required}}{{^required}}(optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+  {{/pathParams}}   *
+     * @return \Illuminate\Http\Response Http response
+     */
+    protected function {{operationId}}(Request $request{{#pathParams}}, ${{paramName}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}) : Response {
+        return new Response('How about implementing {{nickname}} as a {{httpMethod}} method?', 200);
+    }
+    {{/operation}}
+}
+{{/operations}}

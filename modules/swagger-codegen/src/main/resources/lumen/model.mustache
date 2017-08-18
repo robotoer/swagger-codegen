@@ -1,0 +1,79 @@
+<?php
+
+{{>licenseInfo}}
+
+namespace App\Http\Models;
+
+{{#models}}
+{{#model}}
+/**
+ * Model {{{name}}}
+ *
+ * Provides validation and type-safety.
+ */
+class {{classname}} implements Model {
+    {{#vars}}
+    /**
+     * @var {{{datatype}}} {{{name}}} {{{description}}}
+     */
+    protected ${{{name}}}{{#defaultValue}} = {{{defaultValue}}}{{/defaultValue}};
+    {{/vars}}
+
+    {{#vars}}
+    /**
+     * @return {{{datatype}}} The value of the {{{name}}} property.
+     */
+    public function {{{getter}}}() : {{{datatype}}} {
+        return $this->{{{name}}};
+    }
+    /**
+     * @param {{{datatype}}} $value New value for the {{{name}}} property.
+     */
+    public function {{{setter}}}({{{datatype}}} $value) {
+        {{#hasValidation}}
+        // TODO: Add validation logic here.
+        {{/hasValidation}}
+        $this->{{{name}}} = $value;
+    }
+    {{/vars}}
+
+    /**
+     * @return array An array representation of this model.
+     */
+    public function toArray() : array {
+        $retval = [];
+        {{#vars}}
+        if ($this->{{{getter}}}() !== null) {
+            $retval['{{{name}}}'] = $this->{{{getter}}}();
+        }
+        {{/vars}}
+        return $retval;
+    }
+
+    /**
+     * Populates {{classname}} with data provided in an array.
+     *
+     * @param array $arr Array with model data.
+     */
+    public function fromArray(array $arr) {
+        {{#vars}}
+        if (isset($arr['{{{name}}}'])) {
+            $this->{{{setter}}}($arr['{{{name}}}']);
+        }
+        {{/vars}}
+    }
+
+    /**
+     * Factory constructor for {{classname}}.
+     *
+     * @param array $arr Array with model data.
+     * @return {{classname}} A new {{classname}} populated with data from the provided array.
+     */
+    public static function createFromArray(array $arr) : {{classname}} {
+        $n = new {{classname}}();
+        $n->fromArray($arr);
+        return $n;
+    }
+}
+{{/model}}
+{{/models}}
